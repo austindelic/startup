@@ -100,5 +100,6 @@ sudo sh -c 'echo /home/linuxbrew/.linuxbrew/bin/fish >> /etc/shells'
 chsh -s $(which fish)
 
 gh auth login
-
+git config --global user.email "austin@austindelic.com"
+git config --global user.name "Austin Delic"
 echo "Done!"
