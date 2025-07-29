@@ -1,0 +1,19 @@
+ls
+clear
+ls
+cd startup/
+./install.sh
+cd startup/
+nvim .
+zsh
+cd 
+cd .config/
+ls
+cd nushell
+ls
+cat history.txt
+cd startup/
+nvim .
+./install.sh
+ls
+./install.sh

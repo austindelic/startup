@@ -44,6 +44,47 @@ for item in "$CONFIG_DIR"/*; do
   echo "Linked $item → $target"
 done
 
+# Path to your dotfiles directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$SCRIPT_DIR/dotfiles"
+
+# Backup directory
+BACKUP_DIR="$HOME/.dotfiles-backup-$(date +%s)"
+mkdir -p "$BACKUP_DIR"
+
+echo "🔗 Linking dotfiles from $DOTFILES_DIR"
+echo "🛡️ Backups saved to $BACKUP_DIR"
+echo
+
+find "$DOTFILES_DIR" -type f | while read -r src; do
+  rel_path="${src#$DOTFILES_DIR/}"
+
+  # Determine destination
+  if [[ "$rel_path" == config/* ]]; then
+    dest="$HOME/.config/${rel_path#config/}"
+  else
+    filename="$(basename "$rel_path")"
+    # Remove leading dots if any, then add one
+    clean_name=".${filename##*.}"
+    dest="$HOME/$clean_name"
+  fi
+
+  mkdir -p "$(dirname "$dest")"
+
+  # Backup existing file
+  if [[ -e "$dest" || -L "$dest" ]]; then
+    echo "🗂️  Backing up $dest → $BACKUP_DIR/"
+    mv "$dest" "$BACKUP_DIR/"
+  fi
+
+  # Symlink
+  ln -s "$src" "$dest"
+  echo "✅ Linked $dest → $src"
+done
+
+echo
+echo "🎉 Dotfiles setup complete!"
+
 BREWFILE="Brewfile"
 if [ -f "$BREWFILE" ]; then
   echo "Installing packages from $BREWFILE..."
@@ -53,5 +94,9 @@ else
 fi
 
 nvim --headless "+Lazy! sync" +qa
+sudo sh -c 'echo /home/linuxbrew/.linuxbrew/bin/zsh >> /etc/shells'
+chsh -s $(which zsh)
+
+zinit self-update
 
 echo "Done!"
