@@ -81,10 +81,10 @@ for item in "$DOT_FILES_DIR"/*; do
 done
 shopt -u dotglob
 echo "Dotfiles done."
-BREWFILE="Brewfile"
+BREWFILE="./dotfiles/.Brewfile"
 if [ -f "$BREWFILE" ]; then
   echo "Installing packages from $BREWFILE..."
-  brew bundle --file="$BREWFILE"
+  brew bundle --global
 else
   echo "No Brewfile found. Skipping package installation."
 fi
