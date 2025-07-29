@@ -90,7 +90,7 @@ echo "Dotfiles done."
 BREWFILE="./dotfiles/.Brewfile"
 if [ -f "$BREWFILE" ]; then
   echo "Installing packages from $BREWFILE..."
-  brew bundle --global
+  brew bundle --global -v
 else
   echo "No Brewfile found. Skipping package installation."
 fi
