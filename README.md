@@ -1,11 +1,5 @@
-# Run:
+# Run the following for Ubuntu and Debian (apt):
 
 ```bash
-sudo apt upgrade
-sudo apt update
-sudo apt install git
-cd
-git clone https://github.com/austindelic/startup.git
-cd startup
-~/.install.sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/austindelic/startup/HEAD/install.sh)"
 ```

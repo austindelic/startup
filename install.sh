@@ -43,48 +43,42 @@ for item in "$CONFIG_DIR"/*; do
   ln -s "$item" "$target"
   echo "Linked $item → $target"
 done
+echo ".config/ symlinks done."
+DOT_FILES_DIR="$SCRIPT_DIR/dotfiles"
+TARGET_DIR="$HOME"
 
-# Path to your dotfiles directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DOTFILES_DIR="$SCRIPT_DIR/dotfiles"
+# Make sure the config folder exists
+if [ ! -d "$DOT_FILES_DIR" ]; then
+  echo "Error: '$DOT_FILES_DIR' does not exist."
+  exit 1
+fi
 
-# Backup directory
-BACKUP_DIR="$HOME/.dotfiles-backup-$(date +%s)"
-mkdir -p "$BACKUP_DIR"
+echo "Linking dotfiles to $TARGET_DIR"
 
-echo "🔗 Linking dotfiles from $DOTFILES_DIR"
-echo "🛡️ Backups saved to $BACKUP_DIR"
-echo
+# Create ~/.config if it doesn't exist
 
-find "$DOTFILES_DIR" -type f | while read -r src; do
-  rel_path="${src#$DOTFILES_DIR/}"
+# Loop through all files and folders in ./config and link them
 
-  # Determine destination
-  if [[ "$rel_path" == config/* ]]; then
-    dest="$HOME/.config/${rel_path#config/}"
-  else
-    filename="$(basename "$rel_path")"
-    # Remove leading dots if any, then add one
-    clean_name=".${filename##*.}"
-    dest="$HOME/$clean_name"
+shopt -s dotglob nullglob
+for item in "$DOT_FILES_DIR"/*; do
+  name=$(basename "$item")
+  target="$TARGET_DIR/$name"
+
+  # Backup if something already exists
+  if [ -e "$target" ] && [ ! -L "$target" ]; then
+    echo "Backing up existing $target to $target.backup"
+    mv "$target" "$target.backup"
   fi
 
-  mkdir -p "$(dirname "$dest")"
+  # Remove existing symlink if any
+  [ -L "$target" ] && rm "$target"
 
-  # Backup existing file
-  if [[ -e "$dest" || -L "$dest" ]]; then
-    echo "🗂️  Backing up $dest → $BACKUP_DIR/"
-    mv "$dest" "$BACKUP_DIR/"
-  fi
-
-  # Symlink
-  ln -s "$src" "$dest"
-  echo "✅ Linked $dest → $src"
+  # Create symlink
+  ln -s "$item" "$target"
+  echo "Linked $item → $target"
 done
-
-echo
-echo "🎉 Dotfiles setup complete!"
-
+shopt -u dotglob
+echo "Dotfiles done."
 BREWFILE="Brewfile"
 if [ -f "$BREWFILE" ]; then
   echo "Installing packages from $BREWFILE..."
@@ -92,11 +86,9 @@ if [ -f "$BREWFILE" ]; then
 else
   echo "No Brewfile found. Skipping package installation."
 fi
-
+echo "brew done."
 nvim --headless "+Lazy! sync" +qa
-sudo sh -c 'echo /home/linuxbrew/.linuxbrew/bin/zsh >> /etc/shells'
-chsh -s $(which zsh)
-
-zinit self-update
+sudo sh -c 'echo /home/linuxbrew/.linuxbrew/bin/fish >> /etc/shells'
+chsh -s $(which fish)
 
 echo "Done!"
