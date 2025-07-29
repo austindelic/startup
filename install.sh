@@ -5,7 +5,9 @@ sudo apt update
 sudo apt upgrade
 sudo apt-get install build-essential procps curl file git
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
+cd
+git clone https://github.com/austindelic/startup.git
+cd startup
 echo >>/home/austin/.bashrc
 echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >>/home/austin/.bashrc
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -90,5 +92,7 @@ echo "brew done."
 nvim --headless "+Lazy! sync" +qa
 sudo sh -c 'echo /home/linuxbrew/.linuxbrew/bin/fish >> /etc/shells'
 chsh -s $(which fish)
+
+gh auth login
 
 echo "Done!"
